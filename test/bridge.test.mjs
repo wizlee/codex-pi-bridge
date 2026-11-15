@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, rm, cp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { Bridge } from '../src/bridge.mjs';
@@ -16,6 +16,18 @@ async function finished(bridge, id) {
   }
   throw new Error('Worker did not finish');
 }
+
+test('skill discovery works from installation paths with spaces and URL-reserved characters', async t => {
+  const fixture=await mkdtemp(path.join(tmpdir(),'pi fixture #'));
+  await cp(fakePi,path.join(fixture,'fake-pi.mjs'));
+  await cp(path.join(root,'test/skills'),path.join(fixture,'skills'),{recursive:true});
+  const bridge=new Bridge({config:{...config,piCli:path.join(fixture,'fake-pi.mjs')},root});
+  t.after(async()=>{await bridge.close();await rm(fixture,{recursive:true,force:true});});
+  const worker=await bridge.delegate({cwd:root,task:'echo-handoff',skills:['caveman']});
+  const result=await finished(bridge,worker.id);
+  assert.equal(result.state,'completed',result.error);
+  assert.match(result.text,/Use concise language/);
+});
 
 test('a background worker inherits the selected portable skill and normal Pi model defaults', async (t) => {
   const bridge = new Bridge({ config, root });

@@ -6,7 +6,7 @@ Tested tools are mise 2026.11.8, Node 26.13.0, pnpm 10.33.4, and Bun 1.3.14 on W
 
 Current verification:
 
-- 50 regression tests cover inherited protocol/approval behavior, packaging lifecycle, isolated agent environment forwarding, profile preservation, runtime drift, and failed update gates.
+- 51 regression tests cover inherited protocol/approval behavior, packaging lifecycle, isolated agent environment forwarding, profile preservation, runtime drift, failed update gates, and skill paths with spaces and URL-reserved characters.
 - Fresh profile restore installed frozen dependencies without scripts into a new private workspace directory. Normal Pi discovery found the required extension commands and skills. Repeat restore reported unchanged and preserved settings.
 - Strict named qualification passed source/package constraints, all regressions, and actual installed native skill expansion/provider serialization. No model calls.
 - Grill Me npm 0.3.0 entrypoint hash matched the currently installed Git entrypoint.

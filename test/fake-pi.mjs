@@ -1,6 +1,7 @@
 // A model-free external Pi process for testing the public JSONL boundary.
 import { readFileSync } from 'node:fs';
 import { StringDecoder } from 'node:string_decoder';
+import { fileURLToPath } from 'node:url';
 
 const args = process.argv.slice(2);
 const value = (name) => args.includes(name) ? args[args.indexOf(name) + 1] : undefined;
@@ -10,8 +11,8 @@ let pending;
 let promptText = '';
 const commands = [
   { name: 'permission-system', source: 'extension' },
-  { name: 'skill:blocked', source: 'skill', sourceInfo: { path: new URL('./skills/blocked/SKILL.md', import.meta.url).pathname.replace(/^\/(.:\/)/, '$1') } },
-  { name: 'skill:caveman', source: 'skill', sourceInfo: { path: new URL('./skills/caveman/SKILL.md', import.meta.url).pathname.replace(/^\/(.:\/)/, '$1') } },
+  { name: 'skill:blocked', source: 'skill', sourceInfo: { path: fileURLToPath(new URL('./skills/blocked/SKILL.md', import.meta.url)) } },
+  { name: 'skill:caveman', source: 'skill', sourceInfo: { path: fileURLToPath(new URL('./skills/caveman/SKILL.md', import.meta.url)) } },
 ];
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--skill') {

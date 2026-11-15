@@ -19,7 +19,7 @@ if(opts.environment) {
 }
 assert.ok(path.isAbsolute(opts.pi??''),'Pass --pi or --environment with an absolute path');
 const pnpm=opts.pnpm??process.env.npm_execpath;
-const temp=await mkdtemp(path.join(tmpdir(),'bridge-artifact-smoke-'));
+const temp=await mkdtemp(path.join(tmpdir(),'bridge artifact #smoke-'));
 let client;
 try {
   const entries=(await run('tar',['-tzf',opts.tarball])).stdout.trim().split(/\r?\n/);
