@@ -39,4 +39,4 @@ Stop the bridge. In Codex config, disable the managed `pi` entry or remove its c
 
 ## Maintain a release
 
-Update exact dependency pins and the pnpm lock together. Run the suite, installed runtime check, package task, and isolated extracted-artifact staging smoke. For Pi/provider changes, update compatibility pins only after the actual installed serializer qualification and normal discovery pass, then repeat relevant personal approval checks. Review `dist/` contents and provenance before any distribution. Keep source private until ownership and publication scope are approved.
+Update exact dependency pins and the pnpm lock together. Run the suite, installed runtime check, package task, and isolated extracted-artifact staging smoke. For Pi/provider changes, update compatibility pins only after the actual installed serializer qualification and normal discovery pass, then repeat relevant personal approval checks. Review `dist/` contents and provenance before any distribution. Review credentials, local data, dependency notices, and licensing before distributing future releases.

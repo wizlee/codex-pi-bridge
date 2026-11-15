@@ -1,6 +1,6 @@
 # Codex to Pi bridge
 
-Private packaging candidate for the local Windows MCP bridge. Pi runs background workers with its normal trust, extensions, and human permission gates. Fresh installations allow read-only workers and disable request-shape tracing.
+Packaging candidate for the local Windows MCP bridge. Pi runs background workers with its normal trust, extensions, and human permission gates. Fresh installations allow read-only workers and disable request-shape tracing.
 
 Windows x64 is the verified target. Other platforms are unqualified. Node, pnpm, Pi, and permission-extension versions are recorded in `compatibility.json`. Bridge dependencies are pinned in `pnpm-lock.yaml`; that lock does not pin your separate Pi installation.
 
@@ -37,4 +37,4 @@ Skill optimization applies only to recognized Responses payloads with complete n
 
 ## Source and ownership
 
-Imported from the deployed bridge described in [provenance](docs/provenance.md). No benchmark data, credentials, sessions, backups, machine config, Pi source, or permission-extension source is distributed. No remote is configured. Public publication and licensing require a separate ownership and scope review. See `LICENSE`.
+Imported from the deployed bridge described in [provenance](docs/provenance.md). No benchmark data, credentials, sessions, backups, machine config, Pi source, or permission-extension source is distributed. Source is published at [wizlee/codex-pi-bridge](https://github.com/wizlee/codex-pi-bridge). No reuse license is granted. The `private: true` package flag prevents npm publication; it does not control GitHub visibility. See `LICENSE`.
