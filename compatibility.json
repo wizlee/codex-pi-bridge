@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "platforms": ["win32-x64"],
+  "node": "26.13.0",
+  "pnpm": "10.33.4",
+  "mise": "2026.11.8",
+  "pi": {"package":"@earendil-works/pi-coding-agent","version":"1.5.2"},
+  "permissionExtension": {"package":"@gotgenes/pi-permission-system","version":"42.0.0"},
+  "provider": "openai-codex-responses",
+  "humanApprovalBaseline": "2026-11-12 existing deployment only; new machines require personal verification"
+}

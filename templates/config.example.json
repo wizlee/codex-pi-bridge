@@ -1,0 +1,1 @@
+{"piCli":"<absolute path to Pi dist/bundle/cli.js>","writesEnabled":false,"requestShapeTelemetry":false,"startupTimeoutMs":45000,"taskTimeoutMs":1800000}

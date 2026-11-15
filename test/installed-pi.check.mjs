@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { doctor } from '../scripts/doctor.mjs';
+const root=fileURLToPath(new URL('../',import.meta.url));
+test('installed runtime qualification and real MCP discovery work without a model call', {timeout:120000},async t=>{
+  const piCli=process.env.PI_BRIDGE_PI_CLI;
+  assert.ok(path.isAbsolute(piCli??''),'Set PI_BRIDGE_PI_CLI to the absolute installed CLI path');
+  assert.equal((await doctor(piCli)).actualProviderSkillQualification,true);
+  const temp=await mkdtemp(path.join(tmpdir(),'bridge-installed-check-'));t.after(()=>rm(temp,{recursive:true,force:true}));
+  const configFile=path.join(temp,'config.json');
+  await writeFile(configFile,JSON.stringify({piCli,writesEnabled:false,requestShapeTelemetry:false,startupTimeoutMs:45000,taskTimeoutMs:60000,sessionDir:path.join(temp,'sessions')}));
+  const client=new Client({name:'pi-bridge-installed-check',version:'1'},{capabilities:{}});
+  const transport=new StdioClientTransport({command:process.execPath,args:[path.join(root,'src/server.mjs')],cwd:root,stderr:'pipe',env:{...process.env,PI_BRIDGE_CONFIG:configFile}});
+  t.after(()=>client.close());await client.connect(transport);
+  const call=async(name,args)=>JSON.parse((await client.callTool({name,arguments:args})).content[0].text);
+  let state=await call('pi_discover',{cwd:process.env.PI_BRIDGE_TEST_CWD??root});
+  for(let i=0;i<60 && state.state==='starting';i++) state=await call('pi_status',{id:state.id,waitMs:1000});
+  assert.equal(state.state,'completed',state.error);assert.ok(state.extensionCommands.includes('permission-system'));
+  assert.ok(state.model?.id);await client.close();
+});

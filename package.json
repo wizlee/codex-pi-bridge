@@ -1,0 +1,37 @@
+{
+  "name": "local-codex-pi-bridge",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Local MCP delegation to the user's installed Pi CLI, without changing standalone Pi.",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check:pi": "node --test test/installed-pi.check.mjs",
+    "manage": "node scripts/manage.mjs",
+    "check": "node scripts/check.mjs",
+    "package": "node scripts/package.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7",
+    "smol-toml": "1.9.1"
+  },
+  "packageManager": "pnpm@10.33.4",
+  "license": "UNLICENSED",
+  "files": [
+    "src",
+    "scripts",
+    "test",
+    "templates",
+    "docs",
+    "compatibility.json",
+    "pnpm-lock.yaml",
+    "mise.toml",
+    "README.md",
+    "LICENSE"
+  ]
+}

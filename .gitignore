@@ -1,0 +1,9 @@
+node_modules/
+config.json
+sessions/
+backups/
+.cache/
+dist/
+*.tgz
+*.log
+.env*

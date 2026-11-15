@@ -1,0 +1,14 @@
+[tools]
+node = "26.13.0"
+pnpm = "10.33.4"
+
+[tasks.setup]
+run = "pnpm install --frozen-lockfile --ignore-scripts"
+[tasks.test]
+run = "pnpm test"
+[tasks.check]
+run = "pnpm run check"
+[tasks.package]
+run = "pnpm run package"
+[tasks."check:pi"]
+run = "pnpm run check:pi"

@@ -1,0 +1,62 @@
+[
+  {
+    "path": "src/bridge.mjs",
+    "sha256": "2f762be2af91fe2468e86d0176369320698351333fc0ba4f54226446de84f368"
+  },
+  {
+    "path": "src/request-shape.mjs",
+    "sha256": "dcd30975f9b69dc4677c485d6290528d022e6cc3ec75b91a0590e1ff939f1cea"
+  },
+  {
+    "path": "src/rpc.mjs",
+    "sha256": "aa463621f833304bffe8f7979cb3fc022aa6342864e5a4a1f69881517678d2a1"
+  },
+  {
+    "path": "src/server.mjs",
+    "sha256": "aa520778765d0f0f687030a9c37190e09a56a56bde281b70e06f2796f06daec8"
+  },
+  {
+    "path": "src/worker-skill-loading.mjs",
+    "sha256": "284033ef16b8791adfca71a0c0ab747cdbbe5097ff9ab20efdcb9e962c4f18b7"
+  },
+  {
+    "path": "test/bridge.test.mjs",
+    "sha256": "fe1023fdc922ab6bf6f0d2858b7e7b0e2b58f0a36e9212323de04b7a3862e4a4"
+  },
+  {
+    "path": "test/fake-pi.mjs",
+    "sha256": "1616abad2c06799d14fc2227ead5319acae7c6eecbfe6cd1f2e4be5e58218269"
+  },
+  {
+    "path": "test/installed-pi.check.mjs",
+    "sha256": "d6ccabbbddc7beea3e0a6283ee85e43dedc7f9e221fd0f334e5ab308b97499c2"
+  },
+  {
+    "path": "test/mcp.test.mjs",
+    "sha256": "ab898a512838d07e09dd2bafbc3dd768bf856600e1e9952d2ec0d351b3e88758"
+  },
+  {
+    "path": "test/request-shape.test.mjs",
+    "sha256": "3948fabc92bf169578340955cdd4eef8d81ee7b7e9c3d48e1cc50fd2420b6500"
+  },
+  {
+    "path": "test/rpc.test.mjs",
+    "sha256": "c721e1b6141183d20325621bf508f6df69600f484abd44c4037473b8bd84d2b9"
+  },
+  {
+    "path": "test/status.test.mjs",
+    "sha256": "669643eeff8a056e5d0719230ea6f3de39eb0cb5fce52a3c742988e6126f30f6"
+  },
+  {
+    "path": "test/worker-skill-loading.test.mjs",
+    "sha256": "5d7549680112ae8b97ba135e7fe4038867995facdc87f4e868462f78ab1cbf41"
+  },
+  {
+    "path": "test/skills/blocked/SKILL.md",
+    "sha256": "65ee2e32ff96022b12c948264861216547f8e9136fc0e1cd8a4d20dd908090f7"
+  },
+  {
+    "path": "test/skills/caveman/SKILL.md",
+    "sha256": "802e55751d5bde5cedcccbdc424e08865d668444bce394d758c4368be2758b78"
+  }
+]
