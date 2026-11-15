@@ -1,40 +1,64 @@
-# Codex to Pi bridge
+# Pi workbench
 
-Packaging candidate for the local Windows MCP bridge. Pi runs background workers with its normal trust, extensions, and human permission gates. Fresh installations allow read-only workers and disable request-shape tracing.
+Reinstall a pinned personal Pi setup, maintain the Codex-to-Pi bridge, and test upstream changes before switching installations. Windows x64 is the verified target.
 
-Windows x64 is the verified target. Other platforms are unqualified. Node, pnpm, Pi, and permission-extension versions are recorded in `compatibility.json`. Bridge dependencies are pinned in `pnpm-lock.yaml`; that lock does not pin your separate Pi installation.
+The repository has two parts:
 
-## Set up development
+- `profiles/personal/` locks Pi, eight active packages, and portable preferences with a complete pnpm dependency lock.
+- `src/` and `scripts/manage.mjs` provide the MCP bridge, native human approval forwarding, staged bridge upgrades, and rollback.
 
-Install mise using its [official Windows instructions](https://mise.jdx.dev/installing-mise.html#windows). Review `mise.toml`, then run these commands from this repository:
+Node, pnpm, and Bun are pinned through mise. Conda is not needed for this Node toolchain. Existing Pi, credentials, settings, sessions, and saved project trust remain separate.
+
+## Reinstall Pi
+
+Install mise using its [official Windows instructions](https://mise.jdx.dev/installing-mise.html#windows). Review `mise.toml`, then run:
 
 ```powershell
 mise trust
 mise install
 mise run setup
-mise run check
+mise run env:plan
+$piHome = Join-Path $env:LOCALAPPDATA 'pi-workbench/personal-2026-11-15'
+mise exec -- pnpm run env restore --home $piHome
+mise exec -- pnpm run env run --home $piHome
+```
+
+Choose a NEW directory outside this repository. Restore installs frozen dependencies with scripts disabled, generates local package paths, and checks the real runtime without model calls. It refuses an existing unowned directory. Repeating restore preserves local settings. A changed profile requires a new sibling environment, so the previous one remains available.
+
+Open Pi through the same `env run` command. Log in with Pi's native `/login`, configure WakaTime yourself, review permission rules, and run `/ctx-doctor`. Bun is provided through mise; no separate Bun installer, Conda package, or editor restart is needed when using `mise exec`.
+
+See [personal environment setup](docs/environment.md) for package choices, private settings, and environment rollback. Custom user skills and historical data are not silently copied.
+
+## Add the Codex bridge
+
+```powershell
+$bridgeHome = Join-Path $env:LOCALAPPDATA 'pi-workbench/bridge'
+mise exec -- pnpm run manage init --home $bridgeHome --environment $piHome
+mise exec -- pnpm run manage stage --home $bridgeHome
+```
+
+Activate the printed SHA256 and register using [bridge setup](docs/setup.md). Fresh bridge installations allow read-only workers and disable tracing. Existing unowned MCP entries and edited policy blocks require reviewed migration. Native forms and real extension denial/approval must be personally checked before enabling writes.
+
+## Maintain compatibility
+
+```powershell
+mise run updates
 mise run test
 mise run package
 ```
 
-Pins are Node 26.13.0 and pnpm 10.33.4. Packaging was verified with mise 2026.11.8. Tasks use pnpm directly, so a broken global Corepack shim does not need repair. `setup` uses the frozen lock and disables dependency install scripts. `package` reruns checks and tests, then creates a private tarball, SHA-256 file, and source manifest in `dist/`.
+`updates` queries npm metadata without changing anything. [Repair upstream breakage](docs/upgrades.md) explains candidate branches, exact pins, frozen lockfiles, named qualification gates, native Codex checks, and rollback. Unknown future breaking changes can require code repairs. This repository provides the source, tests, diagnostic mode, and update workflow; it cannot promise automatic repair of arbitrary future APIs.
 
-## Install or maintain
+Windows CI installs the locked profile on a fresh runner and tests the actual packed bridge against it. It requires no provider credentials and makes no model calls. No updates or releases deploy automatically.
 
-Read [fresh Windows setup](docs/setup.md), [upgrades and rollback](docs/maintenance.md), and [compatibility checks](docs/compatibility.md). Run management commands through `mise exec -- pnpm run manage`.
+## Bridge behavior
 
-The installer never installs Pi, changes Pi trust, or copies your Pi settings. It refuses to take over an existing unowned `pi` MCP entry or edited managed policy. Keep the current installation intact until migration is explicitly reviewed.
+Tools: `pi_discover`, `pi_delegate`, `pi_status`, `pi_wait`, `pi_follow_up`, `pi_cancel`, and `pi_approval_probe`. Supply absolute project paths and portable skills explicitly. Prefer multi-worker `pi_wait` with all remaining IDs and waits up to 60000 ms. Worker IDs belong to one server process. After restart or failure, inspect partial work and ask the user before rerunning. No worker replay occurs.
 
-## Runtime behavior
+Read-only workers expose read, grep, find, and ls, excluding MCP tools. Extensions retain normal OS permissions; this is not an OS sandbox. Pi trust remains authoritative. The native adapter has no model-callable permission-answer tool. Empty automatic accepts fail closed.
 
-Tools: `pi_discover`, `pi_delegate`, `pi_status`, `pi_wait`, `pi_follow_up`, `pi_cancel`, and `pi_approval_probe`. Supply absolute project paths and relevant portable skills explicitly. Prefer multi-worker `pi_wait` with all remaining IDs and waits up to 60000 ms. Worker IDs exist only in one server process. Restart, failure, cancellation, and timeout require partial-work inspection and user direction before rerunning. The package never replays workers.
+Skill optimization requires recognized Responses payloads and complete native bodies matching the actual request catalog. Other shapes pass through. [Compatibility diagnostics](docs/compatibility.md), [maintenance](docs/maintenance.md), [design](docs/design.md), and [provenance](docs/provenance.md) describe the boundaries.
 
-Read-only workers expose read, grep, find, and ls, excluding MCP tools. Extensions still run with normal OS permissions. This is a tool restriction, not an OS sandbox. Pi project trust remains authoritative. Open interactive Pi and use its trust controls yourself when project resources are intentionally required.
+## Distribution
 
-The native approval adapter has no model-callable answer tool. Empty automatic accepts fail closed. Fresh modifying workers must remain disabled until the user personally verifies native forms and real permission-extension denial and approval. Synthetic tests cannot prove human interaction.
-
-Skill optimization applies only to recognized Responses payloads with complete native skill bodies matching the actual request catalog. Unsupported shapes pass through. Optional request-shape telemetry hashes user content and records shape metadata; it remains off by default. Keep any enabled sidecars private.
-
-## Source and ownership
-
-Imported from the deployed bridge described in [provenance](docs/provenance.md). No benchmark data, credentials, sessions, backups, machine config, Pi source, or permission-extension source is distributed. Source is published at [wizlee/codex-pi-bridge](https://github.com/wizlee/codex-pi-bridge). No reuse license is granted. The `private: true` package flag prevents npm publication; it does not control GitHub visibility. See `LICENSE`.
+Public repository: [wizlee/pi-workbench](https://github.com/wizlee/pi-workbench). Credentials, sessions, memory databases, private permission rules, machine paths, node_modules, and third-party source are excluded. Dependencies are installed from their original packages with their own licenses. No reuse license is granted for this repository. `private: true` prevents npm publication; see `LICENSE`.

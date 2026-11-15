@@ -114,6 +114,7 @@ async function main() {
   if (typeof config.piCli !== 'string' || !path.isAbsolute(config.piCli) || typeof config.writesEnabled !== 'boolean'
       || typeof config.requestShapeTelemetry !== 'boolean'
       || (config.sessionDir !== undefined && (typeof config.sessionDir !== 'string' || !path.isAbsolute(config.sessionDir)))
+      || (config.agentDir !== undefined && (typeof config.agentDir !== 'string' || !path.isAbsolute(config.agentDir)))
       || !Number.isSafeInteger(config.startupTimeoutMs) || config.startupTimeoutMs < 1000
       || !Number.isSafeInteger(config.taskTimeoutMs) || config.taskTimeoutMs < 1000) {
     throw new Error('Invalid pi-bridge/config.json; refusing to start with ambiguous permissions or timeouts.');

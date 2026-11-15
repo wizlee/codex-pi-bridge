@@ -104,7 +104,8 @@ export class Bridge {
       args.push('--skill', skillPath);
     }
     if (worker.state !== 'starting') return;
-    const rpc = worker.rpc = new PiRpc({ cli: this.config.piCli, cwd: worker.cwd, args, timeoutMs: this.config.startupTimeoutMs });
+    const env = this.config.agentDir ? { ...process.env, PI_CODING_AGENT_DIR: this.config.agentDir } : process.env;
+    const rpc = worker.rpc = new PiRpc({ cli: this.config.piCli, cwd: worker.cwd, args, timeoutMs: this.config.startupTimeoutMs, env });
     rpc.on('record', (event) => this.onRecord(worker, event));
     rpc.on('failure', (error) => this.fail(worker, error));
     const state = await rpc.request('get_state');

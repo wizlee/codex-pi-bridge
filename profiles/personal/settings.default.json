@@ -1,0 +1,9 @@
+{
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-6.1-sol",
+  "defaultThinkingLevel": "high",
+  "defaultTools": ["+powershell"],
+  "enableInstallTelemetry": false,
+  "theme": "dark",
+  "memory": {"consolidationModel": "openai/gpt-5.4-mini"}
+}

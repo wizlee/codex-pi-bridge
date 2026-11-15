@@ -1,0 +1,34 @@
+name: Windows compatibility
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  locked-profile-and-bridge:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+        with:
+          version: 2026.11.8
+      - name: Frozen setup and tested artifact
+        shell: pwsh
+        run: |
+          mise run setup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          mise run package
+      - name: Restore locked Pi and smoke bridge without credentials or model calls
+        shell: pwsh
+        run: |
+          $profileHome = Join-Path $env:RUNNER_TEMP 'pi-workbench-personal'
+          pnpm run env restore --home $profileHome
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $archive = (Resolve-Path "dist/local-codex-pi-bridge-$version.tgz").Path
+          $pnpmTool = (mise which pnpm).Trim()
+          node scripts/smoke.mjs --tarball $archive --environment $profileHome --pnpm $pnpmTool

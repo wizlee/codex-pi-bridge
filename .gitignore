@@ -7,3 +7,16 @@ dist/
 *.tgz
 *.log
 .env*
+auth.json
+trust.json
+settings.json
+.wakatime.cfg
+agent/
+runtime/
+reports/
+*.local.json
+*.db
+*.sqlite*
+environment.json
+verified.json
+profile-owner.json

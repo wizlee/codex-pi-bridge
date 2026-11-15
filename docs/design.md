@@ -1,13 +1,21 @@
-# Packaging design
+# Workbench design
 
-Usage is `init`, `stage`, `activate`, `register`, then `rollback` when needed. All paths are explicit and absolute. The repository and live managed home are separate.
+One repository owns a portable personal Pi profile and the Codex bridge that consumes it. The bridge keeps its original package name and source layout; the repository name is Pi workbench. A separate runtime package under `profiles/personal/` has its own complete dependency lock.
 
-The release owns source, tests, scripts, docs, templates, and dependency metadata. `inventory()` derives a deterministic content ID from the package allowlist. Staging installs dependencies at the final release pathname, then writes an atomic verification marker after checks pass. Windows pnpm junctions require that stable pathname. Unverified releases cannot activate.
+Considered shapes:
 
-The managed home owns local desired config, release folders, sessions, history, registration journals, and a stable launcher. The launcher reads one active record and supplies its config through `PI_BRIDGE_CONFIG`. `Bridge` keeps extensions relative to release source while storing sessions in the external configured directory.
+| Design | Benefit | Cost | Decision |
+| --- | --- | --- | --- |
+| Global npm/Conda plus sequential `pi install` | Familiar native commands | Global prefix drift, weak transitive reproducibility, in-place changes | Keep existing installation intact; do not replay it |
+| Separate dotfiles and bridge repositories | Independent ownership | Coordinated version changes span repositories | Unnecessary for one personal compatibility baseline |
+| One repo, locked side-by-side environments, separate bridge lifecycle | One reviewable version matrix; old runtime retained | Extra private environment directories | Chosen |
 
-Activation and rollback own pointer transitions. Registration owns only explicitly marked text blocks. It parses TOML to detect alternate spellings of existing MCP keys, then patches original text without serializing unrelated settings. Edited or unowned blocks require manual review.
+`environment.mjs` owns fresh installation and scoped launch. It generates settings only for a new owned environment and never imports live settings wholesale. Pi's normal local-package discovery loads extensions. Private auth, trust, data, and extra settings live in each environment's agent directory.
 
-An in-place updater was rejected because interrupted copies could mix source generations and lose user state. A symlink-based current directory was rejected because Windows permissions and open handles complicate replacement. Immutable release directories plus an atomic JSON pointer need no symlink privilege and preserve prior generations.
+`manage.mjs` owns bridge staging, activation records, settings-preserving MCP registration, and rollback. A bridge config selects its Pi CLI, optional agent directory, and permission-package location. `PiRpc` passes the selected agent directory to child processes only. Read-only defaults, native human approval forwarding, and trust rules remain enforced.
 
-The exclusive directory lock covers all management mutations and the full launcher lifetime. It is conservative, local to one managed home, and never breaks itself automatically. Worker coordination across installations remains an operator responsibility. No worker replay, persistence, provider benchmark, or public publishing system is added.
+Pi environments are never updated in place by the restore tool. Changed profiles require new directories, retaining old code and data. Bridge activation captures runtime selection and config together; rollback selects the prior environment without copying sessions or credentials. Windows dependency junctions require stable installation paths.
+
+`updates.mjs` reports upstream versions without mutation. `qualify.mjs` keeps named failures and separates candidate diagnostics from strict activation. Candidate mode runs real contracts but never grants permission to activate unsupported versions. Windows CI verifies a credential-free fresh install and real packed MCP artifact.
+
+The design makes future repair possible through maintained source and executable contracts. It does not promise to infer arbitrary future APIs, migrate unknown private data schemas, or certify interactive host UI behavior without human checks.

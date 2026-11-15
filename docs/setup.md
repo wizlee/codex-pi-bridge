@@ -1,6 +1,8 @@
-# Install on a fresh Windows machine
+# Install the bridge on Windows
 
-1. Install Git and mise using the [official Windows guide](https://mise.jdx.dev/installing-mise.html#windows). Clone [wizlee/codex-pi-bridge](https://github.com/wizlee/codex-pi-bridge) or verify and extract a release tarball. Read `mise.toml`, then run the development setup in the README.
+For the full personal Pi setup, first follow [environment setup](environment.md). Then use `manage init --environment <absolute-environment-home>` instead of resolving a global Pi CLI below. The remaining stage, activate, and register steps are identical. This guide also retains the supported existing-Pi route.
+
+1. Install Git and mise using the [official Windows guide](https://mise.jdx.dev/installing-mise.html#windows). Clone [wizlee/pi-workbench](https://github.com/wizlee/pi-workbench) or verify and extract a release tarball. Read `mise.toml`, then run the development setup in the README.
 2. Install `@earendil-works/pi-coding-agent@1.5.2` using Pi's normal installation process. Open interactive Pi, configure your provider yourself, and install `npm:@gotgenes/pi-permission-system@42.0.0` through Pi's package installer. Review the extension's rules. Do not copy another machine's credentials or trust store. This candidate expects the normal user-scoped npm extension location under the Pi agent directory.
 3. Resolve your actual Pi CLI and choose a NEW managed bridge directory. The example generates the absolute CLI path from your npm prefix. It does not assume a username.
 

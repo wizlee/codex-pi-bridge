@@ -1,6 +1,6 @@
 # Compatibility checks
 
-Verified platform: Windows x64. Exact tool and external prerequisite versions live in `compatibility.json`. Unknown Pi or permission-extension versions fail activation. Other platforms are unqualified even if some scripts run there.
+Verified platform: Windows x64. Exact tool and external prerequisite versions live in `compatibility.json`. Unknown Pi or permission-extension versions fail activation. The personal profile locks all other runtime dependencies separately. Other platforms are unqualified even if some scripts run there.
 
 ```powershell
 $env:PI_BRIDGE_PI_CLI = '<absolute Pi dist/bundle/cli.js path>'
@@ -11,7 +11,7 @@ The installed check uses real MCP stdio transport and model-free Pi discovery. I
 
 `node scripts/doctor.mjs <absolute-pi-cli>` also verifies the installed package and permission-extension versions, runs Pi's actual native skill expander and system prompt formatter, then invokes its actual OpenAI Codex Responses serializer with a synthetic credential. The payload hook throws before transport. A localhost-only dummy endpoint prevents a provider request if the fixture contract changes. No real credentials are loaded by that serializer probe. Qualification must remove the unconditional skill-read hint and identify the complete native skill body. Unsupported or changed shapes fail this check instead of silently reporting optimization success.
 
-This probe intentionally depends on private Pi module paths and the native skill expansion method in the tested version. Breakage means compatibility needs review. It does not certify every provider, tool, project extension, TUI feature, or future Pi version. Discovery requires the normal permission-system command. The current extension location check expects user-scoped Pi npm installation; other extension layouts require explicit qualification.
+This probe intentionally depends on private Pi module paths and the native skill expansion method in the tested version. Breakage means compatibility needs review. It does not certify every provider, tool, project extension, TUI feature, or future Pi version. Discovery requires the normal permission-system command. The default extension location is the user-scoped Pi npm installation. Managed profiles pass their explicit permission-package directory and agent directory. Candidate diagnostics can inspect unqualified versions, while activation always uses strict checks. See [upgrade workflow](upgrades.md).
 
 Model-free tests cover protocol safety, native-form forwarding with synthetic responses, multi-worker waits, provisional provider-error recovery, skill qualification, safe install defaults, registration preservation, lifetime locks, activation integrity, and code/config rollback. Synthetic responses never count as personal approval verification.
 

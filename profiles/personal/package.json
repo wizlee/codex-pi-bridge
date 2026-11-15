@@ -1,0 +1,17 @@
+{
+  "name": "pi-workbench-personal-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.33.4",
+  "dependencies": {
+    "@earendil-works/pi-coding-agent": "1.5.2",
+    "@gotgenes/pi-permission-system": "42.0.0",
+    "@majorgilles/pi-grill-me": "0.3.0",
+    "@samfp/pi-memory": "1.6.1",
+    "@vanillagreen/pi-caveman": "3.0.2",
+    "@vanillagreen/pi-extension-manager": "3.0.6",
+    "context-mode": "2.1.10",
+    "pi-autoresearch": "1.9.0",
+    "pi-wakatime": "1.1.3"
+  }
+}

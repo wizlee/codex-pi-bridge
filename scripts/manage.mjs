@@ -6,6 +6,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'smol-toml';
 import { lock } from './launcher.mjs';
+import compatibility from '../compatibility.json' with { type: 'json' };
+export { compatibility };
 
 export const root = fileURLToPath(new URL('../', import.meta.url));
 export const run = promisify(execFile);
@@ -42,11 +44,14 @@ export function validateConfig(config) {
     || typeof config.requestShapeTelemetry !== 'boolean'
     || !Number.isSafeInteger(config.startupTimeoutMs) || config.startupTimeoutMs < 1000
     || !Number.isSafeInteger(config.taskTimeoutMs) || config.taskTimeoutMs < 1000) throw new Error('Invalid bridge configuration');
+  for(const key of ['agentDir','permissionPackage'])if(config[key]!==undefined && !path.isAbsolute(config[key]))throw new Error(`${key} must be absolute`);
 }
+export const doctorArgs=(target,config)=>[path.join(target,'scripts/doctor.mjs'),config.piCli,
+  ...(config.agentDir?['--agent',config.agentDir]:[]),...(config.permissionPackage?['--permission',config.permissionPackage]:[])];
 async function requireManaged(home) {
   if((await optional(path.join(home,'managed.json'))).trim()!=='{"schema":1}') throw new Error('Run init in a NEW managed home first');
 }
-export async function init(home, piCli) {
+export async function init(home, piCli, environment={}) {
   if (!path.isAbsolute(home) || !path.isAbsolute(piCli)) throw new Error('Use absolute home and Pi CLI paths');
   await access(piCli);
   const contents=await readdir(home).catch(e=>{if(e.code==='ENOENT')return [];throw e;});
@@ -54,7 +59,7 @@ export async function init(home, piCli) {
   return lock(home, async () => {
     await atomic(path.join(home,'managed.json'),'{"schema":1}\n');
     const configFile = path.join(home,'config.json');
-    if (!(await optional(configFile))) await atomic(configFile, { piCli, writesEnabled:false, requestShapeTelemetry:false, startupTimeoutMs:45000, taskTimeoutMs:1800000 });
+    if (!(await optional(configFile))) await atomic(configFile, { piCli, ...environment, writesEnabled:false, requestShapeTelemetry:false, startupTimeoutMs:45000, taskTimeoutMs:1800000 });
     validateConfig(await json(configFile));
     const launcher = await readFile(path.join(root,'scripts/launcher.mjs'),'utf8');
     const existing = await optional(path.join(home,'launcher.mjs'));
@@ -67,7 +72,7 @@ export async function stage(home, source, pnpm) {
   await requireManaged(home);
   if (!path.isAbsolute(pnpm ?? '')) throw new Error('Pass absolute pnpm.cjs path via --pnpm, or invoke through pnpm run manage');
   return lock(home, async () => {
-    if((await runPnpm(pnpm,['--version'])).stdout.trim()!=='10.33.4') throw new Error('Expected pnpm 10.33.4');
+    if((await runPnpm(pnpm,['--version'])).stdout.trim()!==compatibility.pnpm) throw new Error(`Expected pnpm ${compatibility.pnpm}`);
     const files = await inventory(source), release = sha(JSON.stringify(files));
     const target = path.join(home,'releases',release);
     const marker = path.join(target,'verified.json');
@@ -97,7 +102,7 @@ export async function activate(home, release) {
     if(JSON.stringify(await inventory(target)) !== JSON.stringify(verified.files)) throw new Error('Staged release modified');
     const config=await json(path.join(home,'config.json')); validateConfig(config);
     // Actual installed runtime checks run before changing active pointer. No model calls.
-    await run(process.execPath,[path.join(target,'scripts/doctor.mjs'),config.piCli],{cwd:target,windowsHide:true,maxBuffer:8*1024*1024});
+    await run(process.execPath,doctorArgs(target,config),{cwd:target,windowsHide:true,maxBuffer:8*1024*1024});
     const old=await optional(path.join(home,'active.json'));
     const previous=old ? JSON.parse(old).record : null;
     if(previous){ const current=await json(path.join(home,'history',previous+'.json')); if(current.release===release && JSON.stringify(current.desired)===JSON.stringify(config)) return {record:previous,release,unchanged:true}; }
@@ -117,7 +122,7 @@ export async function rollback(home) {
     const target=path.join(home,'releases',prior.release), verified=await json(path.join(target,'verified.json'));
     if(sha(JSON.stringify(verified.files))!==prior.release) throw new Error('Verification manifest does not match rollback release ID');
     if(JSON.stringify(await inventory(target)) !== JSON.stringify(verified.files)) throw new Error('Rollback release modified');
-    await run(process.execPath,[path.join(target,'scripts/doctor.mjs'),prior.piCli],{cwd:target,windowsHide:true,maxBuffer:8*1024*1024});
+    await run(process.execPath,doctorArgs(target,prior),{cwd:target,windowsHide:true,maxBuffer:8*1024*1024});
     await atomic(path.join(home,'active.json'),{record:current.previous});
     return {record:current.previous,release:prior.release,rolledBack:true};
   });
@@ -182,7 +187,13 @@ async function main() {
   for(let i=0;i<args.length;i+=2) {if(!args[i].startsWith('--') || !args[i+1]) throw new Error('Expected --key value'); options[args[i].slice(2)]=args[i+1];}
   const home=options.home; if(!home || !path.isAbsolute(home)) throw new Error('--home must be absolute; choose a NEW managed directory');
   let result;
-  if(command==='init') result=await init(home,options.pi);
+  if(command==='init') {
+    if(options.environment) {
+      const env=await json(path.join(options.environment,'environment.json')),verified=await json(path.join(options.environment,'verified.json'));
+      if(!verified.report?.qualifiedVersions || verified.profileDigest!==env.profileDigest)throw new Error('Candidate environment needs strict qualification before bridge pairing');
+      result=await init(home,env.piCli,{agentDir:env.agentDir,permissionPackage:env.permissionPackage});
+    } else result=await init(home,options.pi);
+  }
   else if(command==='stage') result=await stage(home,options.source??root,options.pnpm??(process.env.npm_execpath?.includes('pnpm')?process.env.npm_execpath:undefined));
   else if(command==='activate') result=await activate(home,options.release);
   else if(command==='rollback') result=await rollback(home);

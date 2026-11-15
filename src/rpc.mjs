@@ -4,7 +4,7 @@ import { StringDecoder } from 'node:string_decoder';
 import { randomUUID } from 'node:crypto';
 
 export class PiRpc extends EventEmitter {
-  constructor({ cli, cwd, args = [], timeoutMs = 45000 }) {
+  constructor({ cli, cwd, args = [], timeoutMs = 45000, env = process.env }) {
     super();
     this.timeoutMs = timeoutMs;
     this.pending = new Map();
@@ -12,7 +12,7 @@ export class PiRpc extends EventEmitter {
     this.failure = null;
     this.closing = false;
     this.child = spawn(process.execPath, [cli, '--mode', 'rpc', ...args], {
-      cwd, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true,
+      cwd, env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true,
     });
     this.exited = new Promise((resolve) => { this.resolveExit = resolve; });
     const decoder = new StringDecoder('utf8');

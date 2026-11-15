@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "name": "personal",
+  "piPackage": "@earendil-works/pi-coding-agent",
+  "permissionPackage": "@gotgenes/pi-permission-system",
+  "packages": [
+    "@majorgilles/pi-grill-me",
+    "@vanillagreen/pi-caveman",
+    "@vanillagreen/pi-extension-manager",
+    "context-mode",
+    "@samfp/pi-memory",
+    "pi-wakatime",
+    "pi-autoresearch",
+    "@gotgenes/pi-permission-system"
+  ],
+  "requiredCommands": ["grill", "caveman", "extensions", "memory-consolidate", "autoresearch", "permission-system"],
+  "requiredSkills": ["ctx-doctor", "autoresearch-create"],
+  "excludedLegacyPackages": ["pi-extmgr"],
+  "bun": "1.3.14"
+}

@@ -9,7 +9,15 @@ import { init, stage, activate, register, rollback, run, json, inventory, atomic
 
 const args=process.argv.slice(2),opts={};
 for(let i=0;i<args.length;i+=2) opts[args[i].replace(/^--/,'')]=args[i+1];
-for(const key of ['tarball','pi']) assert.ok(path.isAbsolute(opts[key]??''),`--${key} must be absolute`);
+assert.ok(path.isAbsolute(opts.tarball??''),'--tarball must be absolute');
+let environment={};
+if(opts.environment) {
+  assert.ok(path.isAbsolute(opts.environment));
+  const state=await json(path.join(opts.environment,'environment.json')),verified=await json(path.join(opts.environment,'verified.json'));
+  assert.ok(verified.report?.qualifiedVersions && verified.profileDigest===state.profileDigest,'Strict environment qualification required');
+  opts.pi=state.piCli;environment={agentDir:state.agentDir,permissionPackage:state.permissionPackage};
+}
+assert.ok(path.isAbsolute(opts.pi??''),'Pass --pi or --environment with an absolute path');
 const pnpm=opts.pnpm??process.env.npm_execpath;
 const temp=await mkdtemp(path.join(tmpdir(),'bridge-artifact-smoke-'));
 let client;
@@ -20,7 +28,7 @@ try {
   const source=path.join(temp,'package'),home=path.join(temp,'managed'),codex=path.join(temp,'codex');
   const expected=Object.keys(await inventory(source)).map(f=>'package/'+f).sort();
   assert.deepEqual(entries.filter(f=>!f.endsWith('/')).sort(),expected,'Archive contains files outside package allowlist');
-  await init(home,opts.pi);const config=await json(path.join(home,'config.json'));
+  await init(home,opts.pi,environment);const config=await json(path.join(home,'config.json'));
   assert.equal(config.writesEnabled,false);assert.equal(config.requestShapeTelemetry,false);
   const first=await stage(home,source,pnpm);assert.equal((await stage(home,source,pnpm)).reused,true);
   const firstActive=await activate(home,first.release);await register(home,codex);await register(home,codex);
